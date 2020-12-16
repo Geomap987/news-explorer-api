@@ -3,6 +3,7 @@ const { Joi } = require('celebrate');
 
 const createUserRequest = {
   body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
