@@ -1,6 +1,6 @@
 module.exports = {
   env: {
-    browser: true,
+    browser: false,
     commonjs: true,
     es2021: true,
   },
@@ -11,9 +11,8 @@ module.exports = {
     ecmaVersion: 12,
   },
   rules: {
-    'no-underscore-dangle': 'off',
-    'linebreak-style': 'off',
-    'consistent-return': 'off',
-    'no-unused-vars': ['error', { vars: 'all', args: 'none', ignoreRestSiblings: false }],
+    'no-underscore-dangle': ['error', {
+      allow: ['_id'],
+    }],
   },
 };

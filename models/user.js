@@ -19,8 +19,6 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    minlength: 4,
-    maxlength: 30,
     validate: {
       validator(v) {
         return validator.isEmail(v);

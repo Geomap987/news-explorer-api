@@ -3,8 +3,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Error400 = require('../errors/Error400');
 const Error401 = require('../errors/Error401');
+const Error409 = require('../errors/Error409');
 const Error500 = require('../errors/Error500');
-const { SALT_ROUND, JWT_SECRET } = require('../configs');
+const { SALT_ROUND, JWT_SECRET, JWT_SECRET_DEV } = require('../configs');
 
 const { NODE_ENV } = process.env;
 
@@ -29,8 +30,8 @@ const createUser = (req, res, next) => {
   } = req.body;
   User.findOne({ email }).then((user) => {
     if (user) {
-      const error400 = new Error400('Юзер с таким емейлом уже есть');
-      next(error400);
+      const error409 = new Error409('Юзер с таким емейлом уже есть');
+      next(error409);
     }
     bcrypt.hash(password, SALT_ROUND).then((hash) => User.create({
       name,
@@ -48,13 +49,9 @@ const createUser = (req, res, next) => {
           const error400 = new Error400(`Ошибка валидации: ${messages.join(' ')}`);
           next(error400);
         } else {
-          const error500 = new Error500('Ошибка на сервере');
-          next(error500);
+          next(err);
         }
       });
-  }).catch(() => {
-    const error500 = new Error500('Ошибка на сервере');
-    next(error500);
   });
 };
 
@@ -66,13 +63,12 @@ const loginUser = (req, res, next) => {
   }
   User.findOne({ email }).select('+password').then((user) => {
     if (!user) {
-      const error401 = new Error401('Нет юзера с таким емейлом');
-      next(error401);
+      throw new Error401('Нет юзера с таким емейлом');
     }
     bcrypt.compare(password, user.password).then((matched) => {
       if (matched) {
-        const token = jwt.sign({ id: user._id, email: user.email }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
-        return res.send({ token });
+        const token = jwt.sign({ id: user._id, email: user.email }, NODE_ENV === 'production' ? JWT_SECRET : JWT_SECRET_DEV, { expiresIn: '7d' });
+        res.send({ token });
       }
       const error401 = new Error401('Неправильный пароль');
       next(error401);
@@ -84,8 +80,7 @@ const loginUser = (req, res, next) => {
       const error400 = new Error400(`Ошибка валидации: ${messages.join(' ')}`);
       next(error400);
     } else {
-      const error500 = new Error500('Ошибка на сервере');
-      next(error500);
+      next(err);
     }
   });
 };
