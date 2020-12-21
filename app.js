@@ -32,8 +32,8 @@ mongoose.connect(NODE_ENV === 'production' ? MONGO_BASE : MONGO_BASE_DEV, {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
-app.use(limiter);
 app.use(requestLogger);
+app.use(limiter);
 
 router.use('*', (req, res, next) => {
   const error404 = new Error404('Запрашиваемый ресурс не найден');

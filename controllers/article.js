@@ -17,6 +17,7 @@ const deleteArticleById = (req, res, next) => {
     if (!article) {
       const error404 = new Error404('Нет карточки с таким id');
       next(error404);
+      return;
     }
     const ownerId = article.owner._id;
     const ownerIdString = ownerId.toString();

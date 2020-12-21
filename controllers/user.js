@@ -4,7 +4,6 @@ const User = require('../models/user');
 const Error400 = require('../errors/Error400');
 const Error401 = require('../errors/Error401');
 const Error409 = require('../errors/Error409');
-const Error500 = require('../errors/Error500');
 const { SALT_ROUND, JWT_SECRET, JWT_SECRET_DEV } = require('../configs');
 
 const { NODE_ENV } = process.env;
@@ -18,9 +17,9 @@ const getUserMe = (req, res, next) => {
       if (err.kind === 'ObjectId') {
         const error400 = new Error400('Неправильный id');
         next(error400);
+      } else {
+        next(err);
       }
-      const error500 = new Error500('Ошибка на сервере');
-      next(error500);
     });
 };
 
@@ -32,6 +31,7 @@ const createUser = (req, res, next) => {
     if (user) {
       const error409 = new Error409('Юзер с таким емейлом уже есть');
       next(error409);
+      return;
     }
     bcrypt.hash(password, SALT_ROUND).then((hash) => User.create({
       name,
@@ -60,18 +60,20 @@ const loginUser = (req, res, next) => {
   if (!email || !password) {
     const error400 = new Error400('Не введен емейл или пароль');
     next(error400);
+    return;
   }
   User.findOne({ email }).select('+password').then((user) => {
     if (!user) {
-      throw new Error401('Нет юзера с таким емейлом');
+      throw new Error401('Неправильный пароль');
     }
     bcrypt.compare(password, user.password).then((matched) => {
       if (matched) {
         const token = jwt.sign({ id: user._id, email: user.email }, NODE_ENV === 'production' ? JWT_SECRET : JWT_SECRET_DEV, { expiresIn: '7d' });
         res.send({ token });
+      } else {
+        const error401 = new Error401('Неправильный пароль');
+        next(error401);
       }
-      const error401 = new Error401('Неправильный пароль');
-      next(error401);
     });
   }).catch((err) => {
     if (err.name === 'ValidationError') {
