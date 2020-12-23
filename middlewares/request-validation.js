@@ -29,7 +29,8 @@ const createArticleRequest = {
 
 const deleteArticleRequest = {
   params: Joi.object().keys({
-    articleId: Joi.string().min(24).hex().required(),
+    articleId: Joi.string().min(24).max(24).hex()
+      .required(),
   }).unknown(true),
 };
 

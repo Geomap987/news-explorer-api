@@ -15,22 +15,19 @@ const deleteArticleById = (req, res, next) => {
   const { id } = req.user;
   Article.findOne({ _id: articleId }).select('+owner').then((article) => {
     if (!article) {
-      const error404 = new Error404('Нет карточки с таким id');
-      next(error404);
-      return;
-    }
-    const ownerId = article.owner._id;
-    const ownerIdString = ownerId.toString();
-    if (ownerIdString !== id) {
-      throw new Error403();
-    }
-  })
-    .then(() => {
+      throw new Error404('Нет карточки с таким id');
+    } else {
+      const ownerId = article.owner._id;
+      const ownerIdString = ownerId.toString();
+      if (ownerIdString !== id) {
+        throw new Error403();
+      }
       Article.findByIdAndRemove({ _id: articleId })
         .then((item) => {
           res.send(item);
         });
-    })
+    }
+  })
     .catch((err) => {
       if (err.statusCode === 403) {
         const error403 = new Error403('Нельзя удалять чужую карточку');
@@ -46,7 +43,6 @@ const deleteArticleById = (req, res, next) => {
       }
     });
 };
-
 const createArticle = (req, res, next) => {
   const {
     keyword, title, text, date, source, link, image,
