@@ -1,9 +1,6 @@
 # news-explorer-api
 # API для аутентификации пользователей и сохранения статей
 
-## <https://api.geomap.students.nomoreparties.space>
-## <https://www.api.geomap.students.nomoreparties.space>
-
 ### Основные задачи:
 * Создание пользователя и его авторизация;
 * Создание роута и контроллера для получения информации о пользователе;
