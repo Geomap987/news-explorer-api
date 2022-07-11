@@ -9,7 +9,7 @@ const {
 } = require('../controllers/article');
 
 router.get('/articles', getArticles);
-router.post('/articles', celebrate(createArticleRequest), createArticle);
+router.post('/articles', createArticle);
 router.delete('/articles/:articleId', celebrate(deleteArticleRequest), deleteArticleById);
 
 module.exports = router;
