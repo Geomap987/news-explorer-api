@@ -27,6 +27,7 @@ mongoose.connect(NODE_ENV === 'production' ? MONGO_BASE : MONGO_BASE_DEV, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
+  useUnifiedTopology: true,
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
